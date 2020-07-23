@@ -1,0 +1,9 @@
+Register new user
+Login as existing user
+Logout
+Define finished product (including user)
+Define raw material (including user), assign up to 1 finished product to charge it against; can update this at a later time
+Add a purchase of raw material; include user, raw material id, quantity, purchase amount, date/time
+Add sale of finished product; include user, product id, quantity, sale amount, date/time
+Query total cost of raw materials purchased, total sales of products sold, net profit over a given time interval
+Query number sold, cost of raw materials, total sales, and net profit on individual product
