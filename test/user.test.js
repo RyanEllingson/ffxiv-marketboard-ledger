@@ -48,7 +48,7 @@ describe("User class", () => {
             await userApi.registerAndReturnUser.call(userApi, req, res);
             userId = res.json.mock.calls[0][0].insertId;
             const hash = crypto.createHash("sha256");
-            hash.update(res.json.mock.calls[0][0].insertId.toString());
+            hash.update(userId.toString());
             const hashedId = hash.digest("hex");
             expect(req.session.userId).toBe(hashedId);
             expect(res.json.mock.calls[0][0].affectedRows).toBe(1);
@@ -146,6 +146,41 @@ describe("User class", () => {
             await userApi.registerAndReturnUser.call(userApi, req, res);
             expect(res.json.mock.calls[0][0].error).toBe(true);
             expect(res.json.mock.calls[0][0].password2).toBe("Confirm password field is required");
+        });
+    });
+    describe("Log out from application", () => {
+        it("should remove cookie session from request", () => {
+            req = {
+                session: "something"
+            };
+            res = {
+                json: jest.fn()
+            };
+
+            userApi.logout(req, res);
+            expect(req.session).toBeNull;
+            expect(res.json.mock.calls[0][0].loggedOut).toBe(true);
+        });
+    });
+    describe("Log into existing account", () => {
+        it("should successfully log in and attach cookie session to request", async () => {
+            req = {
+                body: {
+                    email: "test@test.com",
+                    password: "password"
+                },
+                session: {}
+            };
+            res = {
+                json: jest.fn()
+            };
+
+            await userApi.loginAndReturnUser.call(userApi, req, res);
+            const hash = crypto.createHash("sha256");
+            hash.update(userId.toString());
+            const hashedId = hash.digest("hex");
+            expect(req.session.userId).toBe(hashedId);
+            expect(res.json.mock.calls[0][0].email).toBe("test@test.com");
         });
     });
 });

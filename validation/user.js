@@ -59,6 +59,27 @@ class userValidator {
             isValid: this.isEmpty(errors)
         };
     }
+    validateLoginInput(data) {
+        const errors = {};
+
+        const email = data.email ? data.email : "";
+        const password = data.password ? data.password : "";
+
+        if (Validator.isEmpty(email)) {
+            errors.email = "Email field is required";
+        } else if (!Validator.isEmail(email)) {
+            errors.email = "Email is invalid";
+        }
+
+        if (Validator.isEmpty(password)) {
+            errors.password = "Password field is required";
+        }
+
+        return {
+            errors,
+            isValid: this.isEmpty(errors)
+        };
+    }
 }
 
 module.exports = userValidator;

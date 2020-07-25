@@ -18,6 +18,10 @@ app.use(cookieSession({
 app.post("/api/users/register", function(req, res) {
     userApi.registerAndReturnUser.call(userApi, req, res);
 });
+app.get("/api/users/logout", userApi.logout);
+app.post("/api/users/login", function(req, res) {
+    userApi.loginAndReturnUser.call(userApi, req, res);
+});
 
 app.listen(PORT, function() {
     console.log("App listening on PORT: " + PORT);
