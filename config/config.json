@@ -7,6 +7,16 @@
         "port": "3306",
         "dialect": "mysql"
     },
+    "test": {
+        "user": "iwtj2pl39y3rd85j",
+        "password": "nvfb5yqpddb7q9yf",
+        "database": "jxxo5c5l8qwz3f9s",
+        "host": "i943okdfa47xqzpy.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
+        "port": "3306",
+        "socketPath": "~travis/.my.cnf",
+        "dialect": "mysql",
+        "logging": false
+    },
     "production": {
         "use_env_variable": true,
         "dialect": "mysql"
