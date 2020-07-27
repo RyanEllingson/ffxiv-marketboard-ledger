@@ -60,7 +60,6 @@ class Product {
     async addAndReturnProduct(req, res) {
         try {
             const userId = await this.findIdByEmail.call(this, req.body.email);
-            console.log("userId = " + userId);
             const result = await this.addProduct.call(this, req, userId);
             res.json(result);
         } catch(err) {

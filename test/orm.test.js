@@ -48,6 +48,7 @@ describe("Database transactions", () => {
     describe("User class", () => {
         describe("Register new user", () => {
             it("should add a new user to the db and attach cookie session to request", async () => {
+                await clearProducts();
                 await clearUsers();
                 req = {
                     body: {
