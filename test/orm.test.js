@@ -219,7 +219,7 @@ describe("Database transactions", () => {
                     json: jest.fn()
                 };
 
-                await productApi.addAndReturnProduct.call(productApi, req, res);
+                await productApi.addAndReturnProduct(req, res);
                 expect(res.json.mock.calls[0][0].affectedRows).toBe(1);
             });
             it("should return an 'email not found' error", async () => {
@@ -238,7 +238,7 @@ describe("Database transactions", () => {
                     json: jest.fn()
                 };
 
-                await productApi.addAndReturnProduct.call(productApi, req, res);
+                await productApi.addAndReturnProduct(req, res);
                 expect(res.json.mock.calls[0][0].error).toBe(true);
                 expect(res.json.mock.calls[0][0].email).toBe("Email not found");
             });
@@ -258,7 +258,7 @@ describe("Database transactions", () => {
                     json: jest.fn()
                 };
 
-                await productApi.addAndReturnProduct.call(productApi, req, res);
+                await productApi.addAndReturnProduct(req, res);
                 expect(res.json.mock.calls[0][0].error).toBe(true);
                 expect(res.json.mock.calls[0][0].product).toBe("Product already exists");
             });
@@ -278,7 +278,7 @@ describe("Database transactions", () => {
                     json: jest.fn()
                 };
 
-                await productApi.addAndReturnProduct.call(productApi, req, res);
+                await productApi.addAndReturnProduct(req, res);
                 expect(res.json.mock.calls[0][0].error).toBe(true);
                 expect(res.json.mock.calls[0][0].userId).toBe("Invalid credentials");
             });
