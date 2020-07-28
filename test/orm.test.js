@@ -222,6 +222,66 @@ describe("Database transactions", () => {
                 await productApi.addAndReturnProduct.call(productApi, req, res);
                 expect(res.json.mock.calls[0][0].affectedRows).toBe(1);
             });
+            it("should return an 'email not found' error", async () => {
+                req = {
+                    body: {
+                        email: "blah@blah.com",
+                        item_id: "1",
+                        item_name: "test item",
+                        item_url: "testurl.com"
+                    },
+                    session: {
+                        userId: sessionId
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await productApi.addAndReturnProduct.call(productApi, req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].email).toBe("Email not found");
+            });
+            it("should return a 'product already exists' error", async () => {
+                req = {
+                    body: {
+                        email: "test@test.com",
+                        item_id: 1,
+                        item_name: "test item",
+                        image_url: "testurl.com"
+                    },
+                    session: {
+                        userId: sessionId
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await productApi.addAndReturnProduct.call(productApi, req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].product).toBe("Product already exists");
+            });
+            it("should return an 'invalid credentials' error", async () => {
+                req = {
+                    body: {
+                        email: "test@test.com",
+                        item_id: 2,
+                        item_name: "test item",
+                        image_url: "testurl.com"
+                    },
+                    session: {
+                        userId: "qerpqwpoeiuasdfka;"
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await productApi.addAndReturnProduct.call(productApi, req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].userId).toBe("Invalid credentials");
+            });
         });
     });
 });
