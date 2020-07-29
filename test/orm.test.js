@@ -199,6 +199,79 @@ describe("Database transactions", () => {
                 expect(req.session.userId).toBe(hashedId);
                 expect(res.json.mock.calls[0][0].email).toBe("test@test.com");
             });
+            it("should return an 'email is required' error", async () => {
+                req = {
+                    body: {
+                        password: "whatever"
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await userApi.loginAndReturnUser(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].email).toBe("Email field is required");
+            });
+            it("should return an 'email is invalid' error", async () => {
+                req = {
+                    body: {
+                        email: "alkdjf;adlkfj",
+                        password: "password"
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await userApi.loginAndReturnUser(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].email).toBe("Email is invalid");
+            });
+            it("should return a 'password is required' error", async () => {
+                req = {
+                    body: {
+                        email: "test@test.com"
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await userApi.loginAndReturnUser(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].password).toBe("Password field is required");
+            });
+            it("should return an 'email not found' error", async () => {
+                req = {
+                    body: {
+                        email: "blah@blah.com",
+                        password: "blahblah"
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await userApi.loginAndReturnUser(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].email).toBe("Email not found");
+            });
+            it("should return an 'incorrect password' error", async () => {
+                req = {
+                    body: {
+                        email: "test@test.com",
+                        password: "blahblah"
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await userApi.loginAndReturnUser(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].password).toBe("Incorrect password");
+            });
         });
     });
     describe("Product class", () => {
