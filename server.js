@@ -17,13 +17,9 @@ app.use(cookieSession({
     keys: [cookieKey]
 }));
 
-app.post("/api/users/register", function(req, res) {
-    userApi.registerAndReturnUser.call(userApi, req, res);
-});
+app.post("/api/users/register", userApi.registerAndReturnUser);
 app.get("/api/users/logout", userApi.logout);
-app.post("/api/users/login", function(req, res) {
-    userApi.loginAndReturnUser.call(userApi, req, res);
-});
+app.post("/api/users/login", userApi.loginAndReturnUser);
 app.post("/api/products", productApi.addAndReturnProduct)
 
 app.listen(PORT, function() {
