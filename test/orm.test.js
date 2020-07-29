@@ -61,7 +61,7 @@ describe("Database transactions", () => {
                 res = {
                     json: jest.fn()
                 };
-                await userApi.registerAndReturnUser.call(userApi, req, res);
+                await userApi.registerAndReturnUser(req, res);
                 userId = res.json.mock.calls[0][0].insertId;
                 const hash = crypto.createHash("sha256");
                 hash.update(userId.toString());
@@ -82,7 +82,7 @@ describe("Database transactions", () => {
                     json: jest.fn()
                 };
     
-                await userApi.registerAndReturnUser.call(userApi, req, res);
+                await userApi.registerAndReturnUser(req, res);
                 expect(res.json.mock.calls[0][0].error).toBe(true);
                 expect(res.json.mock.calls[0][0].email).toBe("Email field is required");
             });
@@ -98,7 +98,7 @@ describe("Database transactions", () => {
                     json: jest.fn()
                 };
     
-                await userApi.registerAndReturnUser.call(userApi, req, res);
+                await userApi.registerAndReturnUser(req, res);
                 expect(res.json.mock.calls[0][0].error).toBe(true);
                 expect(res.json.mock.calls[0][0].email).toBe("Email is invalid");
             });
@@ -114,7 +114,7 @@ describe("Database transactions", () => {
                     json: jest.fn()
                 };
     
-                await userApi.registerAndReturnUser.call(userApi, req, res);
+                await userApi.registerAndReturnUser(req, res);
                 expect(res.json.mock.calls[0][0].error).toBe(true);
                 expect(res.json.mock.calls[0][0].email).toBe("Email already in use");
             });
@@ -129,7 +129,7 @@ describe("Database transactions", () => {
                     json: jest.fn()
                 };
     
-                await userApi.registerAndReturnUser.call(userApi, req, res);
+                await userApi.registerAndReturnUser(req, res);
                 expect(res.json.mock.calls[0][0].error).toBe(true);
                 expect(res.json.mock.calls[0][0].password).toBe("Password field is required");
             });
@@ -145,7 +145,7 @@ describe("Database transactions", () => {
                     json: jest.fn()
                 };
     
-                await userApi.registerAndReturnUser.call(userApi, req, res);
+                await userApi.registerAndReturnUser(req, res);
                 expect(res.json.mock.calls[0][0].error).toBe(true);
                 expect(res.json.mock.calls[0][0].password2).toBe("Passwords must match");
             });
@@ -160,7 +160,7 @@ describe("Database transactions", () => {
                     json: jest.fn()
                 };
     
-                await userApi.registerAndReturnUser.call(userApi, req, res);
+                await userApi.registerAndReturnUser(req, res);
                 expect(res.json.mock.calls[0][0].error).toBe(true);
                 expect(res.json.mock.calls[0][0].password2).toBe("Confirm password field is required");
             });
@@ -192,7 +192,7 @@ describe("Database transactions", () => {
                     json: jest.fn()
                 };
     
-                await userApi.loginAndReturnUser.call(userApi, req, res);
+                await userApi.loginAndReturnUser(req, res);
                 const hash = crypto.createHash("sha256");
                 hash.update(userId.toString());
                 const hashedId = hash.digest("hex");
