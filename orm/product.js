@@ -3,7 +3,7 @@ const crypto = require("crypto");
 class Product {
     constructor(connection) {
         this.findIdByEmail = (email) => {
-            const queryString = "SELECT user_id FROM users WHERE email = ?"
+            const queryString = "SELECT user_id FROM users WHERE email = ?";
             const dbQuery = (resolve, reject) => {
                 connection.query(queryString, [email], function(err, result) {
                     if (err) {
@@ -57,8 +57,8 @@ class Product {
         };
         this.addAndReturnProduct = async (req, res) => {
             try {
-                const userId = await this.findIdByEmail.call(this, req.body.email);
-                const result = await this.addProduct.call(this, req, userId);
+                const userId = await this.findIdByEmail(req.body.email);
+                const result = await this.addProduct(req, userId);
                 res.json(result);
             } catch(err) {
                 res.json({...err, error: true});
