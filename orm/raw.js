@@ -5,6 +5,7 @@ class Raw {
         this.connection = connection;
         this.findIdByEmail = this.findIdByEmail.bind(this);
         this.doesRawExist = this.doesRawExist.bind(this);
+        this.doesProductExist = this.doesProductExist.bind(this);
         this.addRaw = this.addRaw.bind(this);
         this.addAndReturnRaw = this.addAndReturnRaw.bind(this);
         this.findIdByRaw = this.findIdByRaw.bind(this);
@@ -41,13 +42,35 @@ class Raw {
         };
         return new Promise(dbQuery);
     }
+    doesProductExist(productId) {
+        const queryString = "SELECT * FROM products WHERE product_id = ?";
+        const dbQuery = (resolve, reject) => {
+            this.connection.query(queryString, [productId], function(err, result) {
+                if (err) {
+                    return reject(err);
+                }
+                if (result.length > 0) {
+                    return resolve(true);
+                }
+                return resolve(false);
+            });
+        };
+        return new Promise(dbQuery);
+    }
     async addRaw(req, user_id) {
         const { item_id, item_name, image_url, product_id } = req.body;
         const queryString = "INSERT INTO raws SET ?";
-        const exists = await this.doesRawExist(item_id);
+        const rawExists = await this.doesRawExist(item_id);
+        let productExists = true;
+        if (typeof product_id === "number") {
+            productExists = await this.doesProductExist(product_id);
+        }
         const dbQuery = (resolve, reject) => {
-            if (exists) {
+            if (rawExists) {
                 return reject({raw: "Raw already exists"});
+            }
+            if (!productExists) {
+                return reject({product: "Product not found"})
             }
             const hash = crypto.createHash("sha256");
             hash.update(user_id.toString());
@@ -115,7 +138,7 @@ class Raw {
         } catch(err) {
             res.json({...err, error: true});
         }
-    };
+    }
 }
 
 module.exports = Raw;
