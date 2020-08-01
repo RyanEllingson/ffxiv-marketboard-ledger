@@ -48,16 +48,22 @@ describe("Database transactions", () => {
     };
     let req = {};
     let res = {};
+    let userId;
+    let sessionId;
+    let productId;
+    let rawId;
     beforeEach(() => {
         req = {};
         res = {};
     });
-    let userId;
-    let sessionId;
     beforeAll(async () => {
         await clearRaws();
         await clearProducts();
         await clearUsers();
+        userId = null;
+        sessionId = null;
+        productId = null;
+        rawId = null;
     });
     afterAll(() => {
         connection.end((err) => {
@@ -311,6 +317,7 @@ describe("Database transactions", () => {
                 };
 
                 await productApi.addAndReturnProduct(req, res);
+                productId = res.json.mock.calls[0][0].insertId;
                 expect(res.json.mock.calls[0][0].affectedRows).toBe(1);
             });
             it("should return an 'email not found' error", async () => {
@@ -394,6 +401,7 @@ describe("Database transactions", () => {
                 };
 
                 await rawApi.addAndReturnRaw(req, res);
+                rawId = res.json.mock.calls[0][0].insertId;
                 expect(res.json.mock.calls[0][0].affectedRows).toBe(1);
             });
             it("should return an 'email not found' error", async () => {
@@ -476,6 +484,96 @@ describe("Database transactions", () => {
                 await rawApi.addAndReturnRaw(req, res);
                 expect(res.json.mock.calls[0][0].error).toBe(true);
                 expect(res.json.mock.calls[0][0].userId).toBe("Invalid credentials");
+            });
+        });
+        describe("Assign a product to a raw", () => {
+            it("should successfully assign a product to a raw", async () => {
+                req = {
+                    body: {
+                        raw_id: rawId,
+                        product_id: productId
+                    },
+                    session: {
+                        userId: sessionId
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await rawApi.assignProductAndReturn(req, res);
+                expect(res.json.mock.calls[0][0].affectedRows).toBe(1);
+            });
+            it("should return a 'raw not found' error", async () => {
+                req = {
+                    body: {
+                        raw_id: 0,
+                        product_id: productId
+                    },
+                    session: {
+                        userId: sessionId
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await rawApi.assignProductAndReturn(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].raw).toBe("Raw not found");
+            });
+            it("should return a 'product not found' error", async () => {
+                req = {
+                    body: {
+                        raw_id: rawId,
+                        product_id: 0
+                    },
+                    session: {
+                        userId: sessionId
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await rawApi.assignProductAndReturn(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].product).toBe("Product not found");
+            });
+            it("should return an 'invalid credentials' error", async () => {
+                req = {
+                    body: {
+                        raw_id: rawId,
+                        product_id: productId
+                    },
+                    session: {
+                        userId: "poidfadsfalksdh;l"
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await rawApi.assignProductAndReturn(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].userId).toBe("Invalid credentials");
+            });
+            it("should successfully remove product from a raw", async () => {
+                req = {
+                    body: {
+                        raw_id: rawId,
+                        product_id: null
+                    },
+                    session: {
+                        userId: sessionId
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await rawApi.assignProductAndReturn(req, res);
+                expect(res.json.mock.calls[0][0].affectedRows).toBe(1);
             });
         });
     });
