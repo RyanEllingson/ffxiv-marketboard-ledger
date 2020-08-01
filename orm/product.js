@@ -1,24 +1,6 @@
-const crypto = require("crypto");
+const Orm = require("./orm");
 
-class Product {
-    constructor(connection) {
-        this.connection = connection;
-    }
-    findIdByEmail(email) {
-        const queryString = "SELECT user_id FROM users WHERE email = ?";
-        const dbQuery = (resolve, reject) => {
-            this.connection.query(queryString, [email], function(err, result) {
-                if (err) {
-                    return reject(err);
-                }
-                if (result.length < 1) {
-                    return reject({email: "Email not found"});
-                }
-                return resolve(result[0].user_id);
-            });
-        };
-        return new Promise(dbQuery);
-    }
+class Product extends Orm {
     doesProductExist(itemId) {
         const queryString = "SELECT * FROM products WHERE item_id = ?";
         const dbQuery = (resolve, reject) => {
@@ -42,10 +24,7 @@ class Product {
             if (exists) {
                 return reject({product: "Product already exists"});
             }
-            const hash = crypto.createHash("sha256");
-            hash.update(user_id.toString());
-            const hashedId = hash.digest("hex");
-            if (req.session.userId !== hashedId) {
+            if (!this.validateCredentials (req, user_id)) {
                 return reject({userId: "Invalid credentials"});
             }
             this.connection.query(queryString, { item_id, item_name, image_url, user_id }, function(err, result) {
