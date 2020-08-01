@@ -1,24 +1,6 @@
-const crypto = require("crypto");
+const Orm = require("./orm");
 
-class Raw {
-    constructor(connection) {
-        this.connection = connection;
-    }
-    findIdByEmail(email) {
-        const queryString = "SELECT user_id FROM users WHERE email = ?";
-        const dbQuery = (resolve, reject) => {
-            this.connection.query(queryString, [email], function(err, result) {
-                if (err) {
-                    return reject(err);
-                }
-                if (result.length < 1) {
-                    return reject({email: "Email not found"});
-                }
-                return resolve(result[0].user_id);
-            });
-        };
-        return new Promise(dbQuery);
-    }
+class Raw extends Orm {
     doesRawExist(itemId) {
         const queryString = "SELECT * FROM raws WHERE item_id = ?";
         const dbQuery = (resolve, reject) => {
@@ -64,10 +46,7 @@ class Raw {
             if (!productExists) {
                 return reject({product: "Product not found"})
             }
-            const hash = crypto.createHash("sha256");
-            hash.update(user_id.toString());
-            const hashedId = hash.digest("hex");
-            if (req.session.userId !== hashedId) {
+            if (!this.validateCredentials(req, user_id)) {
                 return reject({userId: "Invalid credentials"});
             }
             this.connection.query(queryString, { item_id, item_name, image_url, product_id, user_id }, function(err, result) {
@@ -117,10 +96,7 @@ class Raw {
             if (!productExists) {
                 return reject({product: "Product not found"});
             }
-            const hash = crypto.createHash("sha256");
-            hash.update(user_id.toString());
-            const hashedId = hash.digest("hex");
-            if (req.session.userId !== hashedId) {
+            if (!this.validateCredentials(req, user_id)) {
                 return reject({userId: "Invalid credentials"});
             }
             this.connection.query(queryString, [product_id, raw_id], function(err, result) {
