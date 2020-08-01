@@ -111,17 +111,24 @@ class Raw {
         };
         return new Promise(dbQuery);
     }
-    assignProduct(req, user_id) {
+    async assignProduct(req, user_id) {
         const { raw_id, product_id } = req.body;
-        const queryString = "UPDATE raws SET ? WHERE raw_id = ?";
+        const queryString = "UPDATE raws SET product_id = ? WHERE raw_id = ?";
+        let productExists = true;
+        if (typeof product_id === "number"){
+            productExists = await this.doesProductExist(product_id);
+        }
         const dbQuery = (resolve, reject) => {
+            if (!productExists) {
+                return reject({product: "Product not found"});
+            }
             const hash = crypto.createHash("sha256");
             hash.update(user_id.toString());
             const hashedId = hash.digest("hex");
             if (req.session.userId !== hashedId) {
                 return reject({userId: "Invalid credentials"});
             }
-            this.connection.query(queryString, { product_id }, [raw_id], function(err, result) {
+            this.connection.query(queryString, [product_id, raw_id], function(err, result) {
                 if (err) {
                     return reject(err);
                 }
