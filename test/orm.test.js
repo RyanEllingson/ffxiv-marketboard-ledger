@@ -400,7 +400,7 @@ describe("Database transactions", () => {
                     json: jest.fn()
                 };
 
-                await rawApi.addAndReturnRaw(req, res);
+                await rawApi.addAndReturnRawProto(req, res);
                 rawId = res.json.mock.calls[0][0].insertId;
                 expect(res.json.mock.calls[0][0].affectedRows).toBe(1);
             });
