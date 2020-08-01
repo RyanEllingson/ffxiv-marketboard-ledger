@@ -3,14 +3,6 @@ const crypto = require("crypto");
 class Raw {
     constructor(connection) {
         this.connection = connection;
-        this.findIdByEmail = this.findIdByEmail.bind(this);
-        this.doesRawExist = this.doesRawExist.bind(this);
-        this.doesProductExist = this.doesProductExist.bind(this);
-        this.addRaw = this.addRaw.bind(this);
-        this.addAndReturnRaw = this.addAndReturnRaw.bind(this);
-        this.findIdByRaw = this.findIdByRaw.bind(this);
-        this.assignProduct = this.assignProduct.bind(this);
-        this.assignProductAndReturn = this.assignProductAndReturn.bind(this);
     }
     findIdByEmail(email) {
         const queryString = "SELECT user_id FROM users WHERE email = ?";
@@ -87,7 +79,7 @@ class Raw {
         };
         return new Promise(dbQuery);
     }
-    async addAndReturnRaw(req, res) {
+    async addAndReturnRawProto(req, res) {
         try {
             const userId = await this.findIdByEmail(req.body.email);
             const result = await this.addRaw(req, userId);
@@ -95,6 +87,9 @@ class Raw {
         } catch(err) {
             res.json({...err, error: true});
         }
+    }
+    get addAndReturnRaw() {
+        return this.addAndReturnRawProto;
     }
     findIdByRaw(rawId) {
         const queryString = "SELECT user_id FROM raws WHERE raw_id = ?";
@@ -137,7 +132,7 @@ class Raw {
         };
         return new Promise(dbQuery);
     }
-    async assignProductAndReturn(req, res) {
+    async assignProductAndReturnProto(req, res) {
         try {
             const userId = await this.findIdByRaw(req.body.raw_id);
             const result = await this.assignProduct(req, userId);
@@ -145,6 +140,9 @@ class Raw {
         } catch(err) {
             res.json({...err, error: true});
         }
+    }
+    get assignProductAndReturn() {
+        return this.assignProductAndReturnProto;
     }
 }
 

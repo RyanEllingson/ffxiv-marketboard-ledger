@@ -6,10 +6,6 @@ class User {
     constructor(connection) {
         this.connection = connection;
         this.validator = new userValidator(connection);
-        this.registerUser = this.registerUser.bind(this);
-        this.registerAndReturnUser = this.registerAndReturnUser.bind(this);
-        this.login = this.login.bind(this);
-        this.loginAndReturnUser = this.loginAndReturnUser.bind(this);
     }
     registerUser(userInfo) {
         const queryString = "INSERT INTO users SET ?";
@@ -30,7 +26,7 @@ class User {
         };
         return new Promise(dbQuery);
     }
-    async registerAndReturnUser(req, res) {
+    async registerAndReturnUserProto(req, res) {
         try {
             const result = await this.registerUser(req.body);
             const hash = crypto.createHash("sha256");
@@ -41,6 +37,9 @@ class User {
         } catch(err) {
             res.json({...err, error: true});
         }
+    }
+    get registerAndReturnUser() {
+        return this.registerAndReturnUserProto;
     }
     logout(req, res) {
         req.session = null;
@@ -71,7 +70,7 @@ class User {
         };
         return new Promise(dbQuery);
     }
-    async loginAndReturnUser(req, res) {
+    async loginAndReturnUserProto(req, res) {
         try {
             const result = await this.login(req.body);
             const hash = crypto.createHash("sha256");
@@ -82,6 +81,9 @@ class User {
         } catch(err) {
             res.json({...err, error: true});
         }
+    }
+    get loginAndReturnUser() {
+        return this.loginAndReturnUserProto;
     }
 }
 
