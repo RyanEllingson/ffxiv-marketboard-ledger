@@ -120,6 +120,33 @@ class Raw extends Orm {
     get assignProductAndReturn() {
         return this.assignProductAndReturnProto;
     }
+    getRaws(req, user_id) {
+        const queryString = "SELECT * FROM raws WHERE user_id = ?";
+        const dbQuery = (resolve, reject) => {
+            if (!this.validateCredentials(req, user_id)) {
+                return reject({userId: "Invalid credentials"});
+            }
+            this.connection.query(queryString, [user_id], function(err, result) {
+                if (err) {
+                    return reject(err);
+                }
+                return resolve(result);
+            });
+        };
+        return new Promise(dbQuery);
+    }
+    async getAndReturnRawsProto(req, res) {
+        try {
+            const userId = await this.findIdByEmail(req.body.email);
+            const result = await this.getRaws(req, userId);
+            res.json(result);
+        } catch(err) {
+            res.json({...err, error: true});
+        }
+    }
+    get getAndReturnRaws() {
+        return this.getAndReturnRawsProto;
+    }
 }
 
 module.exports = Raw;

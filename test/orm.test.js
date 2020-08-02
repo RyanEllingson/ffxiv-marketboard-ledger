@@ -381,6 +381,59 @@ describe("Database transactions", () => {
                 expect(res.json.mock.calls[0][0].userId).toBe("Invalid credentials");
             });
         });
+        describe("Get all products", () => {
+            it("should successfully return all products in the db", async () => {
+                req = {
+                    body: {
+                        email: "test@test.com"
+                    },
+                    session: {
+                        userId: sessionId
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await productApi.getAndReturnProducts(req, res);
+                expect(res.json.mock.calls[0][0].length).toBe(1);
+                expect(res.json.mock.calls[0][0][0].item_name).toBe("test item");
+            });
+            it("should return an 'email not found' error", async () => {
+                req = {
+                    body: {
+                        email: "blah@blah.com"
+                    },
+                    session: {
+                        userId: sessionId
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await productApi.getAndReturnProducts(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].email).toBe("Email not found");
+            });
+            it("should return an 'invalid credentials' error", async () => {
+                req = {
+                    body: {
+                        email: "test@test.com"
+                    },
+                    session: {
+                        userId: "adfipelrkashdlfk"
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await productApi.getAndReturnProducts(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].userId).toBe("Invalid credentials");
+            });
+        });
     });
     describe("Raw class", () => {
         describe("Add a new raw", () => {
@@ -574,6 +627,59 @@ describe("Database transactions", () => {
 
                 await rawApi.assignProductAndReturn(req, res);
                 expect(res.json.mock.calls[0][0].affectedRows).toBe(1);
+            });
+        });
+        describe("Get all raws", () => {
+            it("should successfully return all raws in the db", async () => {
+                req = {
+                    body: {
+                        email: "test@test.com"
+                    },
+                    session: {
+                        userId: sessionId
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await rawApi.getAndReturnRaws(req, res);
+                expect(res.json.mock.calls[0][0].length).toBe(1);
+                expect(res.json.mock.calls[0][0][0].item_name).toBe("test raw");
+            });
+            it("should return an 'email not found' error", async () => {
+                req = {
+                    body: {
+                        email: "blah@blah.com"
+                    },
+                    session: {
+                        userId: sessionId
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await rawApi.getAndReturnRaws(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].email).toBe("Email not found");
+            });
+            it("should return an 'invalid credentials' error", async () => {
+                req = {
+                    body: {
+                        email: "test@test.com"
+                    },
+                    session: {
+                        userId: "fja;dsfhioasdfhalsdkf"
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await rawApi.getAndReturnRaws(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].userId).toBe("Invalid credentials");
             });
         });
     });
