@@ -44,9 +44,36 @@ class Product extends Orm {
         } catch(err) {
             res.json({...err, error: true});
         }
-    };
+    }
     get addAndReturnProduct() {
         return this.addAndReturnProductProto;
+    }
+    getProducts(req, user_id) {
+        const queryString = "SELECT * FROM products WHERE user_id = ?";
+        const dbQuery = (resolve, reject) => {
+            if (!this.validateCredentials(req, user_id)) {
+                return reject({userId: "Invalid credentials"});
+            }
+            this.connection.query(queryString, [user_id], function(err, result) {
+                if (err) {
+                    return reject(err);
+                }
+                return resolve(result);
+            });
+        };
+        return new Promise(dbQuery);
+    }
+    async getAndReturnProductsProto(req, res) {
+        try {
+            const userId = await this.findIdByEmail(req.body.email);
+            const result = await this.getProducts(req, userId);
+            res.json(result);
+        } catch(err) {
+            res.json({...err, error: true});
+        }
+    }
+    get getAndReturnProducts() {
+        return this.getAndReturnProductsProto;
     }
 }
 
