@@ -4,6 +4,7 @@ const connection = require("./config/connection");
 const User = require("./orm/user");
 const Product = require("./orm/product");
 const Raw = require("./orm/raw");
+const Purchase = require("./orm/purchase");
 // const { raw } = require("mysql");
 // Do I need this?
 
@@ -14,6 +15,7 @@ const cookieKey = process.env.COOKIE_KEY || "lfasdj;fkladsj";
 const userApi = new User(connection);
 const productApi = new Product(connection);
 const rawApi = new Raw(connection);
+const purchaseApi = new Purchase(connection);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
