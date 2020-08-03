@@ -3,11 +3,13 @@ const connection = require("../config/connection");
 const User = require("../orm/user");
 const Product = require("../orm/product");
 const Raw = require("../orm/raw");
+const Purchase = require("../orm/purchase");
 const crypto = require("crypto");
 
 const userApi = new User(connection);
 const productApi = new Product(connection);
 const rawApi = new Raw(connection);
+const purchaseApi = new Purchase(connection);
 
 describe("Database transactions", () => {
     const clearUsers = function() {
@@ -46,6 +48,18 @@ describe("Database transactions", () => {
         };
         return new Promise(dbQuery);
     };
+    const clearPurchases = function() {
+        const queryString = "DELETE FROM purchases";
+        const dbQuery = function(resolve, reject) {
+            connection.query(queryString, function(err, result) {
+                if (err) {
+                    return reject(err);
+                }
+                return resolve(result);
+            });
+        };
+        return new Promise(dbQuery);
+    }
     let req = {};
     let res = {};
     let userId;
@@ -57,6 +71,7 @@ describe("Database transactions", () => {
         res = {};
     });
     beforeAll(async () => {
+        await clearPurchases();
         await clearRaws();
         await clearProducts();
         await clearUsers();
@@ -683,4 +698,91 @@ describe("Database transactions", () => {
             });
         });
     });
+    describe("Purchase class", () => {
+        describe("Add a purchase", () => {
+            it("should successfully add a purchase to the db", async () => {
+                req = {
+                    body: {
+                        email: "test@test.com",
+                        raw_id: rawId,
+                        purchase_quantity: 20,
+                        purchase_amount: 30000,
+                        purchase_time: "2020-07-31 18:00:00"
+                    },
+                    session: {
+                        userId: sessionId
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await purchaseApi.addPurchaseAndReturn(req, res);
+                expect(res.json.mock.calls[0][0].affectedRows).toBe(1);
+            });
+            it("should return an 'email not found' error", async () => {
+                req = {
+                    body: {
+                        email: "blah@blah.com",
+                        raw_id: rawId,
+                        purchase_quantity: 20,
+                        purchase_amount: 30000,
+                        purchase_time: "2020-07-31 18:00:00"
+                    },
+                    session: {
+                        userId: sessionId
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await purchaseApi.addPurchaseAndReturn(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].email).toBe("Email not found");
+            });
+            it("should return a 'raw not found' error", async () => {
+                req = {
+                    body: {
+                        email: "test@test.com",
+                        raw_id: "0",
+                        purchase_quantity: 20,
+                        purchase_amount: 30000,
+                        purchase_time: "2020-07-31 18:00:00"
+                    },
+                    session: {
+                        userId: sessionId
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await purchaseApi.addPurchaseAndReturn(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].raw).toBe("Raw not found");
+            });
+            it("should return an 'invalid credentials' error", async () => {
+                req = {
+                    body: {
+                        email: "test@test.com",
+                        raw_id: rawId,
+                        purchase_quantity: 20,
+                        purchase_amount: 30000,
+                        purchase_time: "2020-07-31 18:00:00"
+                    },
+                    session: {
+                        userId: "fpoausdpfoasudflkj"
+                    }
+                };
+                res = {
+                    json: jest.fn()
+                };
+
+                await purchaseApi.addPurchaseAndReturn(req, res);
+                expect(res.json.mock.calls[0][0].error).toBe(true);
+                expect(res.json.mock.calls[0][0].userId).toBe("Invalid credentials");
+            });
+        });
+    })
 });
