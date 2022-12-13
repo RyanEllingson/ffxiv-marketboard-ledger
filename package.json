@@ -19,7 +19,7 @@
   "homepage": "https://github.com/RyanEllingson/ffxiv-marketboard-ledger#readme",
   "dependencies": {
     "cookie-session": "^1.4.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "jest": "^26.1.0",
     "mysql": "^2.18.1",
     "validator": "^13.1.1"
